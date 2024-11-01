@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config
+# from decouple import config
+# Import the Cloudflare R2 config
+import helpers.cloudflare.settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,8 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-f3i-7*#+4!v(2ro_txk5yuf6%+0d6!2q^u0lmi6257&j49h!4z"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DJANGO_DEBUG", cast=bool, default=False)
-
+DEBUG = True
 ALLOWED_HOSTS = []
 
 
@@ -118,11 +119,32 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-CLOUDFLARE_R2_BUCKET = config("CLOUDFLARE_R2_BUCKET")
-CLOUDFLARE_R2_ACCESS_KEY = config("CLOUDFLARE_R2_ACCESS_KEY")
-CLOUDFLARE_R2_SECRET_KEY = config("CLOUDFLARE_R2_SECRET_KEY")
-CLOUDFLARE_R2_BUCKET_ENDPOINT = config("CLOUDFLARE_R2_BUCKET_ENDPOINT")
+# CLOUDFLARE_R2_BUCKET = config("CLOUDFLARE_R2_BUCKET")
+# CLOUDFLARE_R2_ACCESS_KEY = config("CLOUDFLARE_R2_ACCESS_KEY")
+# CLOUDFLARE_R2_SECRET_KEY = config("CLOUDFLARE_R2_SECRET_KEY")
+# CLOUDFLARE_R2_BUCKET_ENDPOINT = config("CLOUDFLARE_R2_BUCKET_ENDPOINT")
 
+# CLOUDFLARE_R2_CONFIG_OPTIONS = {
+#     "bucket_name": CLOUDFLARE_R2_BUCKET,
+#     "access_key": CLOUDFLARE_R2_ACCESS_KEY,
+#     "secret_key": CLOUDFLARE_R2_SECRET_KEY,
+#     "endpoint_url": CLOUDFLARE_R2_BUCKET_ENDPOINT,
+#     "default_acl": "public-read",
+#     "signatue_version": "s3v4",
+# }
+
+# Django 4.2 statisfiles storage configuration
+
+STORAGES = {
+    "default": {
+        "BACKEND": "helpers.cloudflare.storages.MediaFileStorage",
+        "OPTIONS": helpers.cloudflare.settings.CLOUDFLARE_R2_CONFIG_OPTIONS,
+    },
+    "staticfiles": {
+        "BACKEND": "helpers.cloudflare.storages.StaticFileStorage",
+        "OPTIONS": helpers.cloudflare.settings.CLOUDFLARE_R2_CONFIG_OPTIONS,
+    },
+}
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
